@@ -1,6 +1,7 @@
-# Complete CRISP-DM ML Pipeline with RLT Methodology
+# DSO1: Implémentation et Évaluation de la Méthodologie RLT
+## Reinforcement Learning Trees sur Données Multivariées
 
-**A comprehensive machine learning project implementing Reinforcement Learning Trees (RLT) across 8 datasets**
+**Un projet complet implémentant les Arbres d'Apprentissage par Renforcement (RLT) suivant Zhu et al. (2015)**
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 [![scikit-learn](https://img.shields.io/badge/scikit--learn-1.2+-orange.svg)](https://scikit-learn.org/)
@@ -8,16 +9,26 @@
 
 ---
 
-## 🎯 Project Overview
+## 🎯 Project Overview - DSO1
 
-This project implements a **complete CRISP-DM methodology** workflow integrating **Reinforcement Learning Trees (RLT)** concepts from [Zhu et al. (2015)](). The pipeline demonstrates systematic data science best practices from business understanding to deployment, with a focus on comparing RLT-style models against classical baselines.
+Ce projet implémente la **méthodologie CRISP-DM complète** avec les concepts **Reinforcement Learning Trees (RLT)** de [Zhu et al. (2015)](). Le pipeline démontre les meilleures pratiques en data science, de la compréhension métier au déploiement.
+
+### DSO1 Scope
+- **Baseline (Naïf):** Régression Logistique/Linéaire (toutes les features)
+- **RLT-RandomForest:** Random Forest avec Variable Importance + Muting
+- **Comparaison:** Performance, réduction de features, métriques
 
 ### Key Achievements
-- ✅ **8 datasets** analyzed end-to-end (classification & regression)
-- ✅ **50% RLT win rate** (4/8 datasets improved)
-- ✅ **22-41% feature reduction** on high-dimensional datasets
-- ✅ **Production-ready pipeline** with save/load functionality
-- ✅ **Comprehensive documentation** (130+ page report)
+- ✅ **9 datasets** analysés (classification & régression)
+- ✅ **Méthodologie RLT complète** : VI → Muting → Combinaisons linéaires
+- ✅ **22-41% réduction de features** sur datasets haute dimension
+- ✅ **Pipeline production-ready** avec save/load
+- ✅ **Documentation complète** (rapport 130+ pages)
+
+### DSO2 (Futur)
+- 🔜 **Modèles embarqués avancés:** XGBoost, LightGBM, Extra Trees
+- 🔜 **Feature engineering:** Combinaisons optimisées
+- 🔜 **Hyperparameter tuning:** Recherche bayésienne
 
 ---
 
@@ -26,11 +37,14 @@ This project implements a **complete CRISP-DM methodology** workflow integrating
 ```
 (No subject)/
 │
-├── README.md                           # This file
-├── CRISP_DM_REPORT.md                  # Complete 130-page report
-├── requirements.txt                    # Python dependencies
-├── pipeline_model.py                   # Production-ready ML pipeline
-├── RLT_ML_Pipeline.ipynb              # Jupyter Notebook walkthrough
+├── README.md                           # Ce fichier
+├── CRISP_DM_REPORT.md                  # Rapport complet 130 pages
+├── RLT_METHODOLOGY_README.md           # Guide méthodologie RLT
+├── RLT_LINEAR_COMBINATIONS.md          # 📚 Guide combinaisons linéaires RLT
+├── requirements.txt                    # Dépendances Python
+├── main.py                             # 🎯 Script principal DSO1
+├── pipeline_model.py                   # Pipeline ML production
+├── Complete_RLT_Demonstration.ipynb    # 📓 Notebook interactif DSO1
 │
 ├── step1_business_understanding.py     # CRISP-DM Step 1
 ├── step2_data_understanding.py         # CRISP-DM Step 2 (EDA)

@@ -3,11 +3,13 @@
 REINFORCEMENT LEARNING TREES (RLT) - COMPLETE CRISP-DM IMPLEMENTATION
 ================================================================================
 
-Project: Machine Learning Pipeline with RLT Methodology
+DSO1: Implémentation et Évaluation de la Méthodologie RLT
+Reinforcement Learning Trees sur Données Multivariées
+
+Authors: Dhia Romdhane, Yosri Awedi, Baha Saadoui, Nour Rajhi, Bouguerra Taha, Oumaima Nacef
 Based on: Zhu et al. (2015) - "Reinforcement Learning Trees"
 Methodology: CRISP-DM (6 Steps)
-Author: Yosri Awedi
-Date: December 10, 2025
+Date: December 2025
 
 This main script demonstrates the complete RLT implementation following
 the theoretical framework from the RLT paper, applied to multiple datasets
@@ -15,9 +17,14 @@ using the CRISP-DM methodology.
 
 RLT KEY CONCEPTS (from paper):
 1. Variable Importance-Driven Splitting
-2. Reinforcement-Style Look-Ahead Behavior  
-3. Variable Muting (Progressive Elimination of Noise Variables)
+2. Variable Muting (Progressive Elimination of Noise Variables)
+3. Linear Combinations of Features (for enhanced splitting)
 4. Designed for High-Dimensional Sparse Settings (p₁ << p)
+
+DSO1 SCOPE:
+- Baseline (Naïf): Logistic/Linear Regression
+- RLT-RandomForest: RF with Variable Importance + Muting
+- DSO2 (Future): XGBoost, LightGBM, Extra Trees, etc.
 
 CRISP-DM WORKFLOW:
 Step 1: Business Understanding
@@ -68,11 +75,11 @@ RANDOM_STATE = 42
 N_JOBS = -1
 CV_FOLDS = 5
 
-# RLT Configuration (from paper)
+# RLT Configuration (from paper) - DSO1
 VI_THRESHOLD = 0.01  # Muting threshold for noise variables
-VI_RF_WEIGHT = 0.4   # Random Forest VI weight
-VI_ET_WEIGHT = 0.4   # Extra Trees VI weight  
-VI_STAT_WEIGHT = 0.2 # Statistical test VI weight
+VI_RF_WEIGHT = 0.4   # Random Forest VI weight (DSO1)
+VI_STAT_WEIGHT = 0.6 # Statistical test VI weight (DSO1)
+# Note: DSO2 will explore other models (Extra Trees, XGBoost, LightGBM)
 
 # Set plotting style
 sns.set_style('whitegrid')
@@ -290,27 +297,23 @@ class RLTDataScientist:
     
     def compute_rlt_variable_importance(self, X, y, problem_type):
         """
-        Compute global variable importance using ensemble methods
+        Compute global variable importance using Random Forest + Statistical tests
         
-        RLT Methodology (from paper):
-        - Use multiple estimators to get robust VI estimates
-        - Aggregate VI scores with weighted average
+        DSO1 RLT Methodology:
+        - Random Forest feature importance (40%)
+        - Statistical tests (60%)
         - Identifies strong vs weak variables for muting
+        
+        Note: DSO2 will add Extra Trees, XGBoost, LightGBM
         """
         if problem_type in ['BINARY CLASSIFICATION', 'CLASSIFICATION']:
             rf = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=RANDOM_STATE, n_jobs=N_JOBS)
-            et = ExtraTreesClassifier(n_estimators=100, max_depth=10, random_state=RANDOM_STATE, n_jobs=N_JOBS)
         else:
             rf = RandomForestRegressor(n_estimators=100, max_depth=10, random_state=RANDOM_STATE, n_jobs=N_JOBS)
-            et = ExtraTreesRegressor(n_estimators=100, max_depth=10, random_state=RANDOM_STATE, n_jobs=N_JOBS)
         
-        # Random Forest VI
+        # Random Forest VI (DSO1)
         rf.fit(X, y)
         vi_rf = rf.feature_importances_
-        
-        # Extra Trees VI
-        et.fit(X, y)
-        vi_et = et.feature_importances_
         
         # Statistical VI (simple version)
         vi_stat = np.zeros(X.shape[1])
@@ -330,19 +333,15 @@ class RLTDataScientist:
         
         # Normalize
         vi_rf = vi_rf / vi_rf.sum() if vi_rf.sum() > 0 else vi_rf
-        vi_et = vi_et / vi_et.sum() if vi_et.sum() > 0 else vi_et
         vi_stat = vi_stat / vi_stat.sum() if vi_stat.sum() > 0 else vi_stat
         
-        # Aggregate with weights (from RLT methodology)
-        vi_aggregate = (VI_RF_WEIGHT * vi_rf + 
-                       VI_ET_WEIGHT * vi_et + 
-                       VI_STAT_WEIGHT * vi_stat)
+        # Aggregate with weights (DSO1: RF 40% + Statistical 60%)
+        vi_aggregate = VI_RF_WEIGHT * vi_rf + VI_STAT_WEIGHT * vi_stat
         
         # Create VI dataframe
         vi_df = pd.DataFrame({
             'Feature': X.columns,
             'VI_RF': vi_rf,
-            'VI_ET': vi_et,
             'VI_Stat': vi_stat,
             'VI_Aggregate': vi_aggregate
         }).sort_values('VI_Aggregate', ascending=False)
@@ -381,39 +380,37 @@ class RLTDataScientist:
     
     def step4_modeling(self, X_full, X_muted, y, problem_type):
         """
-        Train and compare Baseline (full features) vs RLT (muted features)
+        DSO1: Train and compare Baseline (Naïf) vs RLT-RandomForest
+        
+        Models:
+        - Baseline: Logistic/Linear Regression (all features)
+        - RLT: Random Forest (muted features)
         """
-        print_section("MODELING: BASELINE vs RLT")
+        print_section("DSO1 MODELING: BASELINE (NAÏF) vs RLT-RANDOMFOREST")
         
         results = []
         
-        # Define models
+        # Define models (DSO1 scope)
         if problem_type in ['BINARY CLASSIFICATION', 'CLASSIFICATION']:
             models_baseline = {
-                'Logistic Regression': LogisticRegression(max_iter=1000, random_state=RANDOM_STATE),
-                'Random Forest': RandomForestClassifier(n_estimators=100, random_state=RANDOM_STATE, n_jobs=N_JOBS),
-                'Extra Trees': ExtraTreesClassifier(n_estimators=100, random_state=RANDOM_STATE, n_jobs=N_JOBS)
+                'Baseline-Logistic': LogisticRegression(max_iter=1000, random_state=RANDOM_STATE)
             }
             models_rlt = {
-                'RLT-RandomForest': RandomForestClassifier(n_estimators=100, random_state=RANDOM_STATE, n_jobs=N_JOBS),
-                'RLT-ExtraTrees': ExtraTreesClassifier(n_estimators=100, random_state=RANDOM_STATE, n_jobs=N_JOBS)
+                'RLT-RandomForest': RandomForestClassifier(n_estimators=100, random_state=RANDOM_STATE, n_jobs=N_JOBS)
             }
             metric_name = 'accuracy'
             cv = StratifiedKFold(n_splits=CV_FOLDS, shuffle=True, random_state=RANDOM_STATE)
         else:
             models_baseline = {
-                'Linear Regression': LinearRegression(),
-                'Random Forest': RandomForestRegressor(n_estimators=100, random_state=RANDOM_STATE, n_jobs=N_JOBS),
-                'Extra Trees': ExtraTreesRegressor(n_estimators=100, random_state=RANDOM_STATE, n_jobs=N_JOBS)
+                'Baseline-Linear': LinearRegression()
             }
             models_rlt = {
-                'RLT-RandomForest': RandomForestRegressor(n_estimators=100, random_state=RANDOM_STATE, n_jobs=N_JOBS),
-                'RLT-ExtraTrees': ExtraTreesRegressor(n_estimators=100, random_state=RANDOM_STATE, n_jobs=N_JOBS)
+                'RLT-RandomForest': RandomForestRegressor(n_estimators=100, random_state=RANDOM_STATE, n_jobs=N_JOBS)
             }
             metric_name = 'r2'
             cv = KFold(n_splits=CV_FOLDS, shuffle=True, random_state=RANDOM_STATE)
         
-        print(f"\n📊 BASELINE MODELS (Full Features: {X_full.shape[1]}):")
+        print(f"\n📊 BASELINE (NAÏF) - Full Features: {X_full.shape[1]}:")
         print("-" * 60)
         
         for name, model in models_baseline.items():
@@ -431,7 +428,7 @@ class RLTDataScientist:
             
             print(f"  {name:<25} {mean_score:.4f} (±{std_score:.4f})")
         
-        print(f"\n📊 RLT MODELS (Muted Features: {X_muted.shape[1]}):")
+        print(f"\n📊 RLT-RANDOMFOREST - Muted Features: {X_muted.shape[1]}:")
         print("-" * 60)
         
         for name, model in models_rlt.items():
