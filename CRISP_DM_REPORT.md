@@ -736,7 +736,7 @@ Through this work, I successfully built a **complete CRISP-DM workflow** that in
 ### C. Contact & Support
 
 **Project Repository:** https://github.com/yosriawedi/ML-Project-RLT  
-**Author:** Yosri Awedi  
+**Authors:** Dhia Romdhane, Yosri Awedi, Baha Saadoui, Nour Rajhi, Bouguerra Taha, Oumaima Nacef  
 **Course:** Machine Learning Project  
 **Date:** December 2025
 

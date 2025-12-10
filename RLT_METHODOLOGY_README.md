@@ -2,7 +2,7 @@
 
 ## How RLT Was Implemented in This Project
 
-**Author:** Yosri Awedi  
+**Authors:** Dhia Romdhane, Yosri Awedi, Baha Saadoui, Nour Rajhi, Bouguerra Taha, Oumaima Nacef  
 **Based on:** Zhu et al. (2015) - "Reinforcement Learning Trees"  
 **Repository:** https://github.com/yosriawedi/ML-Project-RLT
 
@@ -510,7 +510,7 @@ jupyter notebook Complete_RLT_Demonstration.ipynb
 
 ## 📧 Contact
 
-**Author:** Yosri Awedi  
+**Authors:** Dhia Romdhane, Yosri Awedi, Baha Saadoui, Nour Rajhi, Bouguerra Taha, Oumaima Nacef  
 **Repository:** https://github.com/yosriawedi/ML-Project-RLT  
 **Course:** Machine Learning Project  
 

@@ -347,7 +347,7 @@ Contributions are welcome! Areas for contribution:
 ## 📧 Contact
 
 **Project:** CRISP-DM ML Pipeline with RLT  
-**Author:** Yosri Awedi  
+**Authors:** Dhia Romdhane, Yosri Awedi, Baha Saadoui, Nour Rajhi, Bouguerra Taha, Oumaima Nacef  
 **Course:** Machine Learning Project  
 **Date:** December 2025  
 **Status:** ✅ Production-Ready
