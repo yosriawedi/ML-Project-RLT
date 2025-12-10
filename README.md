@@ -347,8 +347,9 @@ Contributions are welcome! Areas for contribution:
 ## 📧 Contact
 
 **Project:** CRISP-DM ML Pipeline with RLT  
-**Author:** AI Data Scientist  
-**Date:** December 10, 2025  
+**Author:** Yosri Awedi  
+**Course:** Machine Learning Project  
+**Date:** December 2025  
 **Status:** ✅ Production-Ready
 
 ---
@@ -361,13 +362,12 @@ This project is for educational and research purposes.
 
 ## 🎉 Acknowledgments
 
-- **Zhu et al.** for the original RLT methodology
-- **Breiman et al.** for Random Forests
-- **scikit-learn community** for excellent ML tools
-- **UCI Machine Learning Repository** for datasets
+I would like to thank:
+- **Zhu et al.** for the original RLT methodology that inspired this work
+- **Breiman et al.** for their groundbreaking Random Forests algorithm
+- **scikit-learn community** for providing excellent ML tools
+- **UCI Machine Learning Repository** for making quality datasets available
 
 ---
 
 **⭐ If you find this project useful, please star the repository!**
-
-*Last Updated: December 10, 2025*

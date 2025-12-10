@@ -651,66 +651,66 @@ for batch in get_batches(data, batch_size):
 
 ### 9.1 Project Success
 
-This project successfully demonstrated a **complete CRISP-DM workflow** integrating **Reinforcement Learning Trees (RLT) methodology** across 8 diverse datasets. Key accomplishments:
+Through this work, I successfully built a **complete CRISP-DM workflow** that integrates **Reinforcement Learning Trees (RLT) methodology** across 8 diverse datasets. Here's what I accomplished:
 
-1. ✅ **Systematic Implementation:** Full CRISP-DM pipeline (6 steps) executed end-to-end
-2. ✅ **RLT Methodology:** Variable importance + muting implemented and validated
-3. ✅ **Competitive Performance:** RLT won 4/8 datasets, showing 50% win rate
-4. ✅ **Feature Reduction:** 22-41% reduction in high-dimensional datasets without performance loss
-5. ✅ **Production-Ready:** Deployable pipeline with save/load functionality
-6. ✅ **Comprehensive Documentation:** Complete report, code, and visualizations
+1. ✅ **Systematic Implementation:** I executed the full CRISP-DM pipeline (all 6 steps) from start to finish
+2. ✅ **RLT Methodology:** I implemented and validated variable importance calculation and muting
+3. ✅ **Competitive Performance:** RLT outperformed baselines on 4 out of 8 datasets (50% win rate)
+4. ✅ **Feature Reduction:** I achieved 22-41% feature reduction on high-dimensional datasets while maintaining or improving performance
+5. ✅ **Production-Ready:** I created a deployable pipeline with save/load functionality
+6. ✅ **Comprehensive Documentation:** I documented everything with a complete report, working code, and visualizations
 
-### 9.2 RLT Methodology Verdict
+### 9.2 What I Learned About RLT
 
-**Strengths:**
-- ✅ Effective for high-dimensional sparse datasets
-- ✅ Reduces feature space while maintaining/improving performance
-- ✅ Interpretable (VI scores explain which features matter)
-- ✅ Faster training/inference due to fewer features
+**Where RLT Shines:**
+- ✅ Works great for high-dimensional sparse datasets
+- ✅ Reduces feature space significantly while keeping or improving performance
+- ✅ Highly interpretable - VI scores clearly show which features matter
+- ✅ Trains and predicts faster because it uses fewer features
 
-**Limitations:**
-- ⚠️ No advantage for low-dimensional datasets
-- ⚠️ Requires sufficient samples for stable VI estimation
-- ⚠️ Full RLT (look-ahead, linear splits) not yet implemented
+**Where RLT Falls Short:**
+- ⚠️ Doesn't help much with low-dimensional datasets
+- ⚠️ Needs enough samples for reliable VI estimation
+- ⚠️ The full RLT (look-ahead, linear splits) remains to be implemented
 
-**Recommendation:**
-- ✅ **ADOPT RLT** for high-dimensional problems (p > 20)
-- ✅ **Use VI analysis** even without muting (interpretability)
-- ⚠️ **Avoid RLT** for low-dimensional or small-sample datasets
-- 🔬 **Research needed** for full RLT implementation
+**My Recommendation:**
+- ✅ Use RLT for high-dimensional problems (more than 20 features)
+- ✅ Always compute VI even without muting - it helps with interpretability
+- ⚠️ Skip RLT for low-dimensional datasets or small samples
+- 🔬 Future work should focus on implementing the complete RLT algorithm
 
-### 9.3 Business Impact
+### 9.3 Real-World Impact
 
-**Immediate Value:**
-- **Healthcare:** Deploy Parkinsons and WDBC models (94.9%, 96.5% accuracy)
-- **Education:** Pilot SchoolData model for dropout prevention (+2.92% over baseline)
-- **Real Estate:** Deploy BostonHousing for price estimation (R²=0.904)
+**What Can Be Deployed Now:**
+- **Healthcare:** The Parkinsons and WDBC models are ready (94.9%, 96.5% accuracy)
+- **Education:** SchoolData model can help predict dropouts (+2.92% better than baseline)
+- **Real Estate:** BostonHousing model works well for price estimation (R²=0.904)
 
-**Estimated ROI:**
-- **Medical Diagnosis:** Early detection saves $10,000-$50,000 per patient
-- **Student Retention:** Each prevented dropout saves $200,000+ in lifetime earnings
-- **Real Estate:** Better pricing reduces listing time by 15-20%
+**Potential Value:**
+- **Medical Diagnosis:** Early detection could save $10,000-$50,000 per patient
+- **Student Retention:** Preventing just one dropout saves $200,000+ in lifetime earnings
+- **Real Estate:** Better pricing could reduce listing time by 15-20%
 
-### 9.4 Final Recommendations
+### 9.4 My Recommendations
 
-**For Practitioners:**
-1. **Start with EDA:** Understand dimensionality and sparsity
-2. **Compute VI:** Always useful for interpretability
-3. **Test RLT:** If p > 20 and VI shows clear weak features
-4. **Compare rigorously:** Use cross-validation and hold-out sets
-5. **Deploy best model:** Whether baseline or RLT, choose what works
+**If you're a practitioner:**
+1. **Start with EDA:** Really understand your data's dimensionality and sparsity
+2. **Always compute VI:** It's useful for interpretability even if you don't mute features
+3. **Try RLT when:** You have more than 20 features and VI shows clear weak variables
+4. **Compare properly:** Use cross-validation and hold-out sets to validate results
+5. **Deploy what works:** Choose the best model regardless of whether it's baseline or RLT
 
-**For Researchers:**
-1. **Full RLT implementation:** Custom tree splitter with look-ahead
-2. **Theoretical analysis:** Convergence rates and consistency proofs
-3. **Benchmark studies:** Large-scale systematic evaluation
-4. **Neural RLT:** Combine RLT principles with deep learning
+**If you're doing research:**
+1. **Implement full RLT:** Build a custom tree splitter with look-ahead behavior
+2. **Do theoretical work:** Prove convergence rates and consistency
+3. **Run large benchmarks:** Test on 50+ datasets to understand when RLT excels
+4. **Explore neural RLT:** Try combining RLT principles with deep learning
 
-**For Data Scientists:**
-1. **Use this pipeline:** Adapt for your datasets
-2. **Iterate on VI thresholds:** Optimize for your problem
-3. **Monitor in production:** Track performance over time
-4. **Share findings:** Contribute to RLT community
+**If you're a data scientist:**
+1. **Use my pipeline:** Adapt it for your own datasets
+2. **Tune VI thresholds:** Find what works best for your specific problem
+3. **Monitor in production:** Keep tracking performance over time
+4. **Share your results:** Help the community learn from your experience
 
 ---
 
@@ -735,16 +735,13 @@ This project successfully demonstrated a **complete CRISP-DM workflow** integrat
 
 ### C. Contact & Support
 
-**Project Repository:** (Add GitHub link if applicable)  
-**Questions:** Contact AI Data Scientist  
-**Report Issues:** Submit via issue tracker  
-**Contribute:** Pull requests welcome  
+**Project Repository:** https://github.com/yosriawedi/ML-Project-RLT  
+**Author:** Yosri Awedi  
+**Course:** Machine Learning Project  
+**Date:** December 2025
 
 ---
 
 **END OF REPORT**
 
-*Generated: December 10, 2025*  
-*CRISP-DM Methodology: Fully Implemented*  
-*RLT Integration: Successful*  
-*Status: Production-Ready*
+*This report documents my complete implementation of the CRISP-DM methodology with RLT integration across 8 datasets. All code, models, and results are available in the repository.*
