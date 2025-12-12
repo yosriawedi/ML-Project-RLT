@@ -551,8 +551,14 @@ def create_linear_combinations(X, vi_scores, top_n=10):
     return X_combined
 
 # Create linear combinations for RLT
-X_train_rlt = create_linear_combinations(X_train_muted, vi_scores)
-X_test_rlt = create_linear_combinations(X_test_muted, vi_scores)
+# IMPORTANT: Only use VI scores for features that survived muting!
+vi_scores_muted = vi_scores[vi_scores['Feature'].isin(X_train_muted.columns)].copy()
+vi_scores_muted = vi_scores_muted.reset_index(drop=True)
+
+print(f"\n📋 Features disponibles pour combinaisons: {len(vi_scores_muted)}")
+
+X_train_rlt = create_linear_combinations(X_train_muted, vi_scores_muted)
+X_test_rlt = create_linear_combinations(X_test_muted, vi_scores_muted)
 
 print(f"\n📊 Dataset RLT final:")
 print(f"   - Features originales (après muting): {X_train_muted.shape[1]}")
