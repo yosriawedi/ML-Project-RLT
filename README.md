@@ -7,6 +7,34 @@
 
 ---
 
+## 🚀 Quick Start - Utilisez le Notebook Directement!
+
+### **Option 1: Jupyter Notebook (.ipynb) - RECOMMANDÉ** ⭐
+
+Le moyen le plus simple! Ouvrez directement dans Google Colab:
+
+1. **Allez sur:** https://colab.research.google.com/
+2. **File** → **Upload notebook**
+3. **Sélectionnez:** `RLT_Comparative_Study.ipynb`
+4. **Exécutez cellule par cellule** (Shift+Enter)
+5. **Uploadez votre CSV** quand demandé
+6. **C'est tout!** 🎉
+
+**OU depuis GitHub:**
+1. Cliquez sur `RLT_Comparative_Study.ipynb` dans le repo
+2. Cliquez sur "Open in Colab" 
+3. Exécutez!
+
+✅ **14 cellules pré-configurées**  
+✅ **Pas besoin de copier-coller**  
+✅ **Prêt à l'emploi**
+
+### **Option 2: Script Python (.py)**
+
+Pour usage avancé ou local. Voir `RLT_Complete_Analysis.py`
+
+---
+
 ## 🎯 Objectif
 
 Comparer **RLT-ExtraTrees** (Reinforcement Learning Trees) contre 7 autres modèles de référence sur n'importe quel dataset uploadé.
@@ -59,34 +87,25 @@ VI_STAT_WEIGHT = 0.5
 
 ---
 
-## 🚀 Comment Utiliser
+## 📝 Fichiers du Projet
 
-### Option 1: Google Colab (RECOMMANDÉ)
+### 1. **RLT_Comparative_Study.ipynb** ⭐
+   - Jupyter Notebook prêt à l'emploi
+   - 14 cellules pré-configurées
+   - Ouvrez directement dans Colab
+   - **UTILISER CE FICHIER!**
 
-1. **Ouvrir Google Colab**: https://colab.research.google.com/
+### 2. **RLT_Complete_Analysis.py**
+   - Script Python complet
+   - Pour usage avancé ou local
+   - Contient le même code que le notebook
 
-2. **Créer un nouveau notebook**
+### 3. **README.md**
+   - Ce fichier
+   - Documentation complète
 
-3. **Copier le contenu de `RLT_Complete_Analysis.py`** dans Colab
-
-4. **Découper en cellules**:
-   - Chercher les lignes avec `# ===... CELLULE X`
-   - Créer une nouvelle cellule pour chaque section
-
-5. **Exécuter cellule par cellule** (Shift+Enter)
-
-6. **Upload votre dataset CSV** quand demandé (Cellule 4)
-
-7. **Attendre les résultats** et visualisations
-
-### Option 2: Utiliser le fichier Python directement
-
-```python
-# Dans Colab, créez une cellule et exécutez:
-!wget https://raw.githubusercontent.com/yosriawedi/ML-Project-RLT/main/RLT_Complete_Analysis.py
-
-# Puis copiez-collez le contenu dans des cellules
-```
+### 4. **QUICK_START_GUIDE.md**
+   - Guide rapide pas-à-pas
 
 ---
 
