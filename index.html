@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>RLT Model Training</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #a8edea, #fed6e3);
+      text-align: center;
+      padding: 50px;
+      color: #333;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: 2em;
+      margin-top: 30px;
+    }
+
+    form {
+      background-color: #ffffffdd;
+      padding: 25px 50px;
+      border-radius: 15px;
+      display: inline-block;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      font-size: 1.2em;
+      margin: 10px;
+    }
+
+    label {
+      display: block;
+      margin: 20px 0 5px;
+      font-weight: bold;
+    }
+
+    input[type="file"] {
+      padding: 10px;
+      width: 250px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 12px 25px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1.2em;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #trainStatus {
+      margin-top: 15px;
+      font-size: 1em;
+      font-weight: bold;
+      color: #333;
+    }
+
+    #metrics {
+      margin-top: 15px;
+      text-align: left;
+      display: inline-block;
+      background: #ffffffdd;
+      padding: 15px 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      font-family: monospace;
+      white-space: pre-line;
+    }
+
+    .decorative {
+      margin-top: 40px;
+      width: 400px;
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+  <h1>RLT Model Training</h1>
+
+  <h2>Uploader un dataset et entraîner</h2>
+  <form id="trainForm">
+    <label>Dataset (CSV) :</label>
+    <input type="file" id="trainFile" accept=".csv">
+    <button type="submit">Uploader &amp; entraîner</button>
+    <p id="trainStatus"></p>
+  </form>
+
+  <div id="metrics"></div>
+
+  <img class="decorative" src="https://images.unsplash.com/photo-1580584123154-4d31c6e4d4bb?auto=format&fit=crop&w=800&q=80" alt="Boston">
+
+  <script>
+    const trainForm = document.getElementById("trainForm");
+    trainForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById("trainFile");
+      const statusEl = document.getElementById("trainStatus");
+      const metricsEl = document.getElementById("metrics");
+
+      if (!fileInput.files.length) {
+        statusEl.textContent = "Veuillez choisir un fichier CSV.";
+        metricsEl.textContent = "";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+      formData.append("vi_threshold", "0.01");
+      formData.append("apply_muting", "true");
+      formData.append("target_col", "medv");
+
+      statusEl.textContent = "Entraînement en cours...";
+      metricsEl.textContent = "";
+
+      try {
+        const response = await fetch("/upload-and-train", {
+          method: "POST",
+          body: formData
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          statusEl.textContent = result.message || "Modèle entraîné avec succès.";
+
+          if (result.metrics) {
+            const m = result.metrics;
+            metricsEl.textContent =
+              "Métriques du modèle (régression):\n" +
+              "R²   : " + m.r2.toFixed(4) + "\n" +
+              "RMSE : " + m.rmse.toFixed(4) + "\n" +
+              "MSE  : " + m.mse.toFixed(4) + "\n" +
+              "MAE  : " + m.mae.toFixed(4);
+          } else {
+            metricsEl.textContent = "Aucune métrique renvoyée par l'API.";
+          }
+        } else {
+          statusEl.textContent = "Erreur: " + (result.detail || JSON.stringify(result));
+          metricsEl.textContent = "";
+        }
+      } catch (err) {
+        statusEl.textContent = "Erreur réseau pendant l'entraînement.";
+        metricsEl.textContent = "";
+      }
+    });
+  </script>
+</body>
+</html>
