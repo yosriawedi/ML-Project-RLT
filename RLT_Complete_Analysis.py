@@ -473,7 +473,68 @@ print(f"   - Features mutées: {len(low_vi_features)} ({len(low_vi_features)/X_t
 print(f"   - Features gardées: {len(high_vi_features)} ({len(high_vi_features)/X_train.shape[1]*100:.1f}%)")
 print(f"   - Seuil VI: {VI_THRESHOLD}")
 
-print("\\n✅ Variable Importance terminé!")
+print("\n✅ Variable Importance terminé!")
+
+# ==============================================================================
+# CELLULE 7b: RLT - LINEAR COMBINATIONS
+# ==============================================================================
+
+print("\n" + "="*70)
+print("🔗 RLT: COMBINAISONS LINÉAIRES")
+print("="*70)
+
+def create_linear_combinations(X, vi_scores, top_n=10):
+    """
+    Create linear combinations of top features
+    Based on RLT methodology (Zhu et al. 2015)
+    """
+    print("\n🔢 Création de combinaisons linéaires...")
+    
+    X_combined = X.copy()
+    top_features = vi_scores.head(top_n)['Feature'].tolist()
+    
+    # Ensure we have at least 2 features
+    if len(top_features) < 2:
+        print("   ⚠️  Pas assez de features pour combinaisons")
+        return X_combined
+    
+    combinations_created = 0
+    
+    # Create combinations between top features
+    for i in range(min(5, len(top_features)-1)):
+        for j in range(i+1, min(i+3, len(top_features))):
+            feat1 = top_features[i]
+            feat2 = top_features[j]
+            
+            # Weighted combination based on VI
+            w1 = vi_scores[vi_scores['Feature'] == feat1]['VI_Aggregate'].values[0]
+            w2 = vi_scores[vi_scores['Feature'] == feat2]['VI_Aggregate'].values[0]
+            
+            # Normalize weights
+            total_w = w1 + w2
+            w1_norm = w1 / total_w if total_w > 0 else 0.5
+            w2_norm = w2 / total_w if total_w > 0 else 0.5
+            
+            # Create linear combination
+            new_col_name = f"LC_{i}_{j}"
+            X_combined[new_col_name] = w1_norm * X[feat1] + w2_norm * X[feat2]
+            combinations_created += 1
+    
+    print(f"   ✅ {combinations_created} combinaisons linéaires créées")
+    print(f"   📊 Features totales: {X.shape[1]} → {X_combined.shape[1]}")
+    
+    return X_combined
+
+# Create linear combinations for RLT
+X_train_rlt = create_linear_combinations(X_train_muted, vi_scores)
+X_test_rlt = create_linear_combinations(X_test_muted, vi_scores)
+
+print(f"\n📊 Dataset RLT final:")
+print(f"   - Features originales (après muting): {X_train_muted.shape[1]}")
+print(f"   - Features avec combinaisons: {X_train_rlt.shape[1]}")
+print(f"   - Combinaisons ajoutées: {X_train_rlt.shape[1] - X_train_muted.shape[1]}")
+
+print("\n✅ Combinaisons linéaires créées!")
 
 # ==============================================================================
 # CELLULE 8: MODÉLISATION - DÉFINITION DES MODÈLES
@@ -488,7 +549,7 @@ p = X_train.shape[1]
 mtry_sqrt = max(1, int(np.sqrt(p)))
 mtry_log = max(1, int(np.log(p)))
 
-print(f"\\n📊 Paramètres mtry:")
+print(f"\n📊 Paramètres mtry:")
 print(f"   - p (total features): {p}")
 print(f"   - √p: {mtry_sqrt}")
 print(f"   - log(p): {mtry_log:.2f} → {mtry_log}")
@@ -500,9 +561,9 @@ if problem_type == 'classification':
     models = {
         '1. RLT-ExtraTrees': {
             'model': ExtraTreesClassifier(**TREE_CONFIG),
-            'X_train': X_train_muted,
-            'X_test': X_test_muted,
-            'description': 'RLT avec Extra Trees + Variable Muting'
+            'X_train': X_train_rlt,
+            'X_test': X_test_rlt,
+            'description': 'RLT avec VI + Muting + Linear Combinations'
         },
         '2. RF': {
             'model': RandomForestClassifier(**TREE_CONFIG),
@@ -552,9 +613,9 @@ else:  # Regression
     models = {
         '1. RLT-ExtraTrees': {
             'model': ExtraTreesRegressor(**TREE_CONFIG),
-            'X_train': X_train_muted,
-            'X_test': X_test_muted,
-            'description': 'RLT avec Extra Trees + Variable Muting'
+            'X_train': X_train_rlt,
+            'X_test': X_test_rlt,
+            'description': 'RLT avec VI + Muting + Linear Combinations'
         },
         '2. RF': {
             'model': RandomForestRegressor(**TREE_CONFIG),
@@ -600,12 +661,12 @@ else:  # Regression
         }
     }
 
-print(f"\\n📋 Modèles définis:")
+print(f"\n📋 Modèles définis:")
 for name, config in models.items():
     print(f"   {name}: {config['description']}")
     print(f"      → Features: {config['X_train'].shape[1]}")
 
-print("\\n✅ Modèles configurés!")
+print("\n✅ Modèles configurés!")
 
 # ==============================================================================
 # CELLULE 9: ENTRAÎNEMENT DES MODÈLES
@@ -618,7 +679,7 @@ print("="*70)
 results = []
 
 for model_name, config in models.items():
-    print(f"\\n{'='*60}")
+    print(f"\n{'='*60}")
     print(f"🏃 Entraînement: {model_name}")
     print(f"{'='*60}")
     
@@ -687,7 +748,7 @@ for model_name, config in models.items():
             'Train_Time': train_time
         })
 
-print(f"\\n{'='*60}")
+print(f"\n{'='*60}")
 print("✅ TOUS LES MODÈLES ENTRAÎNÉS!")
 print(f"{'='*60}")
 
@@ -702,7 +763,7 @@ print("="*70)
 # Create results DataFrame
 results_df = pd.DataFrame(results)
 
-print("\\n📋 Tableau Complet des Résultats:")
+print("\n📋 Tableau Complet des Résultats:")
 display(results_df)
 
 # Sort by test performance
@@ -717,20 +778,28 @@ else:
     metric_name = 'Test R²'
     metric_col = 'Test_R2'
 
-print(f"\\n🏆 MEILLEUR MODÈLE:")
+print(f"\n🏆 MEILLEUR MODÈLE:")
 print(f"   - Nom: {best_model['Model']}")
 print(f"   - {metric_name}: {best_model[metric_col]:.4f}")
 print(f"   - Features: {best_model['Features']}")
 print(f"   - Temps: {best_model['Train_Time']:.2f}s")
 
-# Find RLT position
-rlt_position = results_df_sorted[results_df_sorted['Model'].str.contains('RLT')].index[0] + 1
-print(f"\\n🌲 RLT-ExtraTrees:")
+# Find RLT position (in sorted dataframe)
+rlt_row = results_df_sorted[results_df_sorted['Model'].str.contains('RLT')]
+if len(rlt_row) > 0:
+    rlt_position = rlt_row.index.tolist()[0] + 1
+    rlt_score = results_df[results_df['Model'].str.contains('RLT')].iloc[0][metric_col]
+else:
+    rlt_position = len(results_df)
+    rlt_score = 0
+
+print(f"\n🌲 RLT-ExtraTrees:")
 print(f"   - Position: #{rlt_position} / {len(results_df)}")
-print(f"   - {metric_name}: {results_df[results_df['Model'].str.contains('RLT')].iloc[0][metric_col]:.4f}")
+print(f"   - {metric_name}: {rlt_score:.4f}")
+print(f"   - Features utilisées: {X_train_rlt.shape[1]} (original: {X_train.shape[1]})")
 
 # Visualizations
-print("\\n📊 Génération des visualisations...")
+print("\n📊 Génération des visualisations...")
 
 # Plot 1: Performance comparison
 plt.figure(figsize=(14, 6))
@@ -754,7 +823,7 @@ plt.tight_layout()
 plt.show()
 
 # Summary statistics
-print(f"\\n📈 STATISTIQUES GLOBALES:")
+print(f"\n📈 STATISTIQUES GLOBALES:")
 print(f"   - Meilleur {metric_name}: {results_df[metric_col].max():.4f}")
 print(f"   - Pire {metric_name}: {results_df[metric_col].min():.4f}")
 print(f"   - Moyenne {metric_name}: {results_df[metric_col].mean():.4f}")
@@ -765,7 +834,7 @@ rlt_score = results_df[results_df['Model'].str.contains('RLT')].iloc[0][metric_c
 best_other_score = results_df[~results_df['Model'].str.contains('RLT')][metric_col].max()
 improvement = ((rlt_score - best_other_score) / best_other_score) * 100
 
-print(f"\\n🔍 ANALYSE RLT:")
+print(f"\n🔍 ANALYSE RLT:")
 if rlt_score > best_other_score:
     print(f"   ✅ RLT est MEILLEUR que les autres modèles")
     print(f"   📈 Amélioration: +{improvement:.2f}%")
@@ -776,12 +845,20 @@ else:
     print(f"   ⚠️  RLT est moins performant")
     print(f"   📉 Différence: {improvement:.2f}%")
 
-print(f"\\n💡 CONCLUSION:")
-print(f"   Le modèle {best_model['Model']} obtient les meilleures performances")
-print(f"   avec un {metric_name} de {best_model[metric_col]:.4f}")
-print(f"   RLT-ExtraTrees se classe #{rlt_position} sur {len(results_df)} modèles.")
+print(f"\n💡 CONCLUSION:")
+print(f"   🏆 Meilleur modèle: {best_model['Model']}")
+print(f"   📊 {metric_name}: {best_model[metric_col]:.4f}")
+if rlt_position == 1:
+    print(f"   🌲 RLT-ExtraTrees: GAGNANT! (#1/{len(results_df)})")
+    print(f"   ✅ VI + Muting + Linear Combinations = Succès!")
+elif rlt_position <= 3:
+    print(f"   🌲 RLT-ExtraTrees: Très bon résultat (#{rlt_position}/{len(results_df)})")
+    print(f"   📈 Performance compétitive avec {rlt_score:.4f}")
+else:
+    print(f"   🌲 RLT-ExtraTrees: #{rlt_position}/{len(results_df)}")
+    print(f"   💡 Suggestion: Ajuster VI_THRESHOLD ou combinaisons")
 
-print("\\n" + "="*70)
+print("\n" + "="*70)
 print("✅ ANALYSE COMPLÈTE TERMINÉE!")
 print("="*70)
 
@@ -791,7 +868,7 @@ print("="*70)
 
 print("="*70)
 print("💾 SAUVEGARDE DES RÉSULTATS")
-print("="*70")
+print("="*70)
 
 # Save results to CSV
 csv_filename = f"results_{filename.replace('.csv', '')}.csv"
@@ -810,6 +887,7 @@ print(f"   - Samples: {df.shape[0]}")
 print(f"   - Features (origin): {df.shape[1] - 1}")
 print(f"   - Features (after prep): {X_train.shape[1]}")
 print(f"   - Features (RLT muted): {X_train_muted.shape[1]}")
+print(f"   - Features (RLT + combinations): {X_train_rlt.shape[1]}")
 print(f"   - Models entraînés: 8")
 print(f"   - Meilleur modèle: {best_model['Model']}")
 print(f"   - Meilleur {metric_name}: {best_model[metric_col]:.4f}")
