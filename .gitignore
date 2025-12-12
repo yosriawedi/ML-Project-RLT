@@ -45,3 +45,6 @@ Thumbs.db
 *.tmp
 *.bak
 *.log
+
+# Scripts de génération (privés)
+generate_*.py
