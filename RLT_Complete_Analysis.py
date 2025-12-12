@@ -454,24 +454,49 @@ plt.gca().invert_yaxis()
 plt.tight_layout()
 plt.show()
 
-# Apply muting
-high_vi_features = vi_scores[vi_scores['VI_Aggregate'] >= VI_THRESHOLD]['Feature'].tolist()
-low_vi_features = vi_scores[vi_scores['VI_Aggregate'] < VI_THRESHOLD]['Feature'].tolist()
+# Apply muting with ADAPTIVE threshold
+print(f"\n🔇 Variable Muting (Seuil Adaptatif):")
+
+# Calculate adaptive threshold based on VI distribution
+vi_values = vi_scores['VI_Aggregate'].values
+vi_median = np.median(vi_values)
+vi_mean = np.mean(vi_values)
+vi_std = np.std(vi_values)
+
+# Adaptive threshold: use mean of VI or percentile-based
+# Strategy: Keep top features above mean or use percentile
+adaptive_threshold = max(VI_THRESHOLD, vi_mean)  # At least VI_THRESHOLD, but adaptive to data
+
+# Alternative: percentile-based (keep top 60% of features)
+# percentile_threshold = np.percentile(vi_values, 40)
+# adaptive_threshold = max(VI_THRESHOLD, percentile_threshold)
+
+print(f"   📊 Statistiques VI:")
+print(f"      - Médiane: {vi_median:.4f}")
+print(f"      - Moyenne: {vi_mean:.4f}")
+print(f"      - Écart-type: {vi_std:.4f}")
+print(f"   🎯 Seuil fixe (config): {VI_THRESHOLD}")
+print(f"   ⚡ Seuil adaptatif (utilisé): {adaptive_threshold:.4f}")
+
+high_vi_features = vi_scores[vi_scores['VI_Aggregate'] >= adaptive_threshold]['Feature'].tolist()
+low_vi_features = vi_scores[vi_scores['VI_Aggregate'] < adaptive_threshold]['Feature'].tolist()
 
 # Ensure minimum features
 if len(high_vi_features) < 5:
+    print(f"   ⚠️  Seuil trop strict, gardons au moins 5 features")
     high_vi_features = vi_scores.head(5)['Feature'].tolist()
     low_vi_features = vi_scores.iloc[5:]['Feature'].tolist()
+    adaptive_threshold = vi_scores.iloc[4]['VI_Aggregate']
 
 # Create muted datasets
 X_train_muted = X_train[high_vi_features]
 X_test_muted = X_test[high_vi_features]
 
-print(f"\\n🔇 Variable Muting:")
+print(f"\n   ✂️  Résultat du Muting:")
 print(f"   - Original features: {X_train.shape[1]}")
 print(f"   - Features mutées: {len(low_vi_features)} ({len(low_vi_features)/X_train.shape[1]*100:.1f}%)")
 print(f"   - Features gardées: {len(high_vi_features)} ({len(high_vi_features)/X_train.shape[1]*100:.1f}%)")
-print(f"   - Seuil VI: {VI_THRESHOLD}")
+print(f"   - Seuil final: {adaptive_threshold:.4f}")
 
 print("\n✅ Variable Importance terminé!")
 
@@ -784,12 +809,18 @@ print(f"   - {metric_name}: {best_model[metric_col]:.4f}")
 print(f"   - Features: {best_model['Features']}")
 print(f"   - Temps: {best_model['Train_Time']:.2f}s")
 
-# Find RLT position (in sorted dataframe)
-rlt_row = results_df_sorted[results_df_sorted['Model'].str.contains('RLT')]
-if len(rlt_row) > 0:
-    rlt_position = rlt_row.index.tolist()[0] + 1
-    rlt_score = results_df[results_df['Model'].str.contains('RLT')].iloc[0][metric_col]
-else:
+# Find RLT position (in sorted dataframe) - FIX: use position in sorted, not original index!
+rlt_score = None
+rlt_position = None
+
+for idx, model_name in enumerate(results_df_sorted['Model'].values):
+    if 'RLT' in model_name:
+        rlt_position = idx + 1  # Position in sorted ranking (1-indexed)
+        rlt_score = results_df_sorted.iloc[idx][metric_col]
+        break
+
+# Fallback if not found
+if rlt_position is None:
     rlt_position = len(results_df)
     rlt_score = 0
 
