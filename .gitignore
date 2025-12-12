@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Data files
+*.csv
+*.xls
+*.xlsx
+*.data
+*.names
+
+# Models
+*.pkl
+*.h5
+*.model
+
+# Results
+results_*.csv
+models/
+prepared_data/
+evaluation/
+visualizations/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary
+*.tmp
+*.bak
+*.log
