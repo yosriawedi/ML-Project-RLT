@@ -1,0 +1,214 @@
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+import pandas as pd
+from model_RLT import RLTMLPipeline
+import os
+
+MODEL_PATH = " from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+import pandas as pd
+from model_RLT import RLTMLPipeline
+import os
+
+MODEL_PATH = "rlt_model.pkl"
+DATA_PATH = "BostonHousing.csv"
+
+# -------------------------------
+# Chargement pipeline RLT
+# -------------------------------
+if os.path.exists(MODEL_PATH):
+    pipeline = RLTMLPipeline.load_model(MODEL_PATH)
+else:
+    pipeline = None
+
+# -------------------------------
+# Création FastAPI
+# -------------------------------
+app = FastAPI(
+    title="RLT ML Pipeline API",
+    description="API pour prédire et réentraîner le modèle RLT",
+    version="1.0.0",
+)
+
+
+# -------------------------------
+# Schémas JSON
+# -------------------------------
+class InputData(BaseModel):
+    # On laisse toutes les colonnes possibles de ton dataset Boston
+    crim: float
+    zn: float
+    indus: float
+    chas: int
+    nox: float
+    rm: float
+    age: float
+    dis: float
+    rad: int
+    tax: float
+    ptratio: float
+    b: float
+    lstat: float
+
+
+class RetrainParams(BaseModel):
+    target_col: str = "medv"
+    vi_threshold: float = 0.01
+    apply_muting: bool = True
+
+
+# -------------------------------
+# Endpoint /predict
+# -------------------------------
+@app.post("/predict")
+def predict(data: InputData):
+    try:
+        if pipeline is None:
+            raise HTTPException(status_code=400, detail="Modèle non chargé")
+
+        df = pd.DataFrame([data.dict()])
+        X_scaled, _ = pipeline.preprocess(df, target_col=None, fit=False)
+        pred = pipeline.predict(X_scaled)
+
+        return {"prediction": float(pred[0])}
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Erreur lors de la prédiction : {str(e)}"
+        )
+
+
+# -------------------------------
+# Endpoint /retrain
+# -------------------------------
+@app.post("/retrain")
+def retrain(params: RetrainParams):
+    try:
+        if not os.path.exists(DATA_PATH):
+            raise HTTPException(status_code=404, detail="Fichier de données introuvable")
+
+        df = pd.read_csv(DATA_PATH)
+
+        # Supprimer lignes avec NaN dans y
+        df = df.dropna(subset=[params.target_col])
+
+        # Initialiser pipeline
+        global pipeline
+        pipeline = RLTMLPipeline(problem_type="regression", vi_threshold=params.vi_threshold)
+
+        # Preprocessing
+        X_scaled, y = pipeline.preprocess(df, target_col=params.target_col, fit=True)
+
+        # Entraînement
+        pipeline.train(X_scaled, y, apply_muting=params.apply_muting)
+
+        # Sauvegarde
+        pipeline.save_model(MODEL_PATH)
+
+        return {"status": "success", "message": "Modèle RLT réentraîné et sauvegardé."}
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Erreur pendant le réentraînement : {str(e)}"
+        )
+"
+DATA_PATH = "BostonHousing.csv"
+
+# -------------------------------
+# Chargement pipeline RLT
+# -------------------------------
+if os.path.exists(MODEL_PATH):
+    pipeline = RLTMLPipeline.load_model(MODEL_PATH)
+else:
+    pipeline = None
+
+# -------------------------------
+# Création FastAPI
+# -------------------------------
+app = FastAPI(
+    title="RLT ML Pipeline API",
+    description="API pour prédire et réentraîner le modèle RLT",
+    version="1.0.0",
+)
+
+
+# -------------------------------
+# Schémas JSON
+# -------------------------------
+class InputData(BaseModel):
+    # On laisse toutes les colonnes possibles de ton dataset Boston
+    crim: float
+    zn: float
+    indus: float
+    chas: int
+    nox: float
+    rm: float
+    age: float
+    dis: float
+    rad: int
+    tax: float
+    ptratio: float
+    b: float
+    lstat: float
+
+
+class RetrainParams(BaseModel):
+    target_col: str = "medv"
+    vi_threshold: float = 0.01
+    apply_muting: bool = True
+
+
+# -------------------------------
+# Endpoint /predict
+# -------------------------------
+@app.post("/predict")
+def predict(data: InputData):
+    try:
+        if pipeline is None:
+            raise HTTPException(status_code=400, detail="Modèle non chargé")
+
+        df = pd.DataFrame([data.dict()])
+        X_scaled, _ = pipeline.preprocess(df, target_col=None, fit=False)
+        pred = pipeline.predict(X_scaled)
+
+        return {"prediction": float(pred[0])}
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Erreur lors de la prédiction : {str(e)}"
+        )
+
+
+# -------------------------------
+# Endpoint /retrain
+# -------------------------------
+@app.post("/retrain")
+def retrain(params: RetrainParams):
+    try:
+        if not os.path.exists(DATA_PATH):
+            raise HTTPException(status_code=404, detail="Fichier de données introuvable")
+
+        df = pd.read_csv(DATA_PATH)
+
+        # Supprimer lignes avec NaN dans y
+        df = df.dropna(subset=[params.target_col])
+
+        # Initialiser pipeline
+        global pipeline
+        pipeline = RLTMLPipeline(problem_type="regression", vi_threshold=params.vi_threshold)
+
+        # Preprocessing
+        X_scaled, y = pipeline.preprocess(df, target_col=params.target_col, fit=True)
+
+        # Entraînement
+        pipeline.train(X_scaled, y, apply_muting=params.apply_muting)
+
+        # Sauvegarde
+        pipeline.save_model(MODEL_PATH)
+
+        return {"status": "success", "message": "Modèle RLT réentraîné et sauvegardé."}
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Erreur pendant le réentraînement : {str(e)}"
+        )
